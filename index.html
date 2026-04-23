@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> ANOUA DOC CLONE - OCR Pro</title>
+  <title>Ella Clone - OCR Pro</title>
   <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
@@ -158,7 +158,7 @@
     .log .warn { color: var(--yellow); }
 
     /* ── Download buttons ── */
-    .dl-wrap { display: none; margin-top: 20px; display: none; flex-direction: column; gap: 10px; }
+    .dl-wrap { display: none; margin-top: 20px; flex-direction: column; gap: 10px; }
     .btn-dl {
       width: 100%; border: none; border-radius: 12px; padding: 15px;
       font-family: var(--fh); font-size: 14px; font-weight: 700;
@@ -226,8 +226,8 @@
 
   <!-- Downloads -->
   <div class="dl-wrap" id="dlWrap">
-    <button class="btn-dl word" id="btnWord">⬇️ &nbsp;Télécharger le .docx</button>
-    <button class="btn-dl txt"  id="btnTxt">Télécharger le .txt brut (OCR)</button>
+    <button class="btn-dl word" id="btnWord" style="display:none">⬇️ &nbsp;Télécharger le .docx</button>
+    <button class="btn-dl txt"  id="btnTxt"  style="display:none">Télécharger le .txt brut (OCR)</button>
   </div>
 
 </div>
@@ -318,7 +318,7 @@ $('fileInput').addEventListener('change', async e => {
       setFill(75);
       log('Structure reconstruite.', 'ok');
 
-      // ── PHASE 3 : Build DOCX ────────────────────────────────────────
+      // ── PHASE 3 : Build DOCX
       stepActive(3);
       setStatus('Génération du fichier Word…');
       log('Construction du .docx…', 'info');
@@ -326,31 +326,26 @@ $('fileInput').addEventListener('change', async e => {
       setFill(100);
       log('Fichier Word prêt !', 'ok');
       setStatus('Terminé ✓');
-
       $('btnWord').style.display = 'flex';
       $('btnWord').onclick = () => dlBlob(docxBlob, 'Ella_Clone_Document.docx');
 
     } catch (err) {
       log('Claude : ' + err.message, 'err');
-      log('Fallback : téléchargement du .txt OCR disponible.', 'warn');
+      log('Fallback : .txt disponible.', 'warn');
       setStatus('Erreur Claude — .txt disponible');
       $('btnWord').style.display = 'none';
     }
 
   } else {
-    // No API key → skip Claude, offer only txt
-    log('Pas de clé API — saut de l\'étape Claude.', 'warn');
-    setStatus('OCR terminé (sans reconstruction Word)');
+    log('Pas de clé API — OCR seul.', 'warn');
+    setStatus('OCR terminé — .txt disponible');
     setFill(100);
     $('btnWord').style.display = 'none';
   }
 
-  // Always offer txt
-  $('btnTxt').onclick = () => {
-    const blob = new Blob([ocrText], { type: 'text/plain' });
-    dlBlob(blob, 'Scan_Ella_Clone.txt');
-  };
-
+  // Toujours afficher le bouton txt
+  $('btnTxt').style.display = 'flex';
+  $('btnTxt').onclick = () => dlBlob(new Blob([ocrText], { type: 'text/plain' }), 'Scan_Ella_Clone.txt');
   $('dlWrap').style.display = 'flex';
   $('selectBtn').disabled = false;
   // Reset file input so same files can be reselected
